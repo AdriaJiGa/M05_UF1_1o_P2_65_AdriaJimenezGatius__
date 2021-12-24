@@ -1,7 +1,8 @@
 #include "Map.h"
-#include "Enemy.h"
+
+#include "Player.h"
 #include "TimeManager.h"
-#include <vector>
+
 
 /// <summary>
 /// Sets the needed variables
@@ -20,15 +21,17 @@ void Logic();
 /// </summary>
 void Draw();
 
-enum USER_INPUTS { NONE, UP, DOWN, RIGHT, LEFT, QUIT };
+
 Map pacman_map = Map();
 std::vector<Enemy> enemigos;
+Player player = Player(pacman_map.spawn_player);
 //Enemy enemy1 = Enemy(pacman_map.spawn_enemy);
-char player_char = 'O';
+//char player_char = 'O';
 int player_x = 1;
 int player_y = 1;
-int player_points = 0;
-int player_lifes = 3;
+//int player_points = 0;
+//int player_lifes = 3;
+
 USER_INPUTS input = USER_INPUTS::NONE;
 bool run = true;
 bool win = false;
@@ -36,8 +39,7 @@ bool lose = false;
 
 int main()
 {
- /*   TimeManager::getInstance().variable = 0; .
-    std::cout << TimeManager::getInstance().variable;*/
+
 
     Setup();
     while (run)
@@ -52,8 +54,9 @@ void Setup()
 {
     std::cout.sync_with_stdio(false);
     srand(time(NULL));
-    player_x = pacman_map.spawn_player.X;
-    player_y = pacman_map.spawn_player.Y;
+
+
+
     unsigned short enemyNumber = 0;
     std::cout << "Cuantos enemigos quieres?";
     std::cin >> enemyNumber;
@@ -102,84 +105,36 @@ void Logic()
     }
     else
     {
-        int player_y_new = player_y;
-        int player_x_new = player_x;
-        switch (input)
+        if (input == USER_INPUTS::QUIT)
         {
-        case UP:
-            player_y_new--;
-            break;
-        case DOWN:
-            player_y_new++;
-            break;
-        case RIGHT:
-            player_x_new++;
-            break;
-        case LEFT:
-            player_x_new--;
-            break;
-        case QUIT:
             run = false;
-            break;
         }
-        if (player_x_new < 0)
-        {
-            player_x_new = pacman_map.Width - 1;
-        }
-        player_x_new %= pacman_map.Width;
-        if (player_y_new < 0)
-        {
-            player_y_new = pacman_map.Height - 1;
-        }
-        player_y_new %= pacman_map.Height;
-
-        switch (pacman_map.GetTile(player_x_new, player_y_new))
-        {
-        case Map::MAP_TILES::MAP_WALL:
-            player_y_new = player_y;
-            player_x_new = player_x;
-            break;
-        case Map::MAP_TILES::MAP_POINT:
-            pacman_map.points--;
-            player_points++;
-            pacman_map.SetTile(player_x_new, player_y_new, Map::MAP_TILES::MAP_EMPTY);
-            break; 
-        case Map::MAP_TILES::MAP_POWERUP:
-            player_points+=25;
-            for (size_t i = 0; i < enemigos.size(); i++)
-            {
-                enemigos[i].PowerUpPicked();
-            }
-            //enemy1.PowerUpPicked();
-            pacman_map.SetTile(player_x_new, player_y_new, Map::MAP_TILES::MAP_EMPTY);
-            break;
-        }
-        player_y = player_y_new;
-        player_x = player_x_new;
+        player.Update(&pacman_map, input);
+    }
         for (size_t i = 0; i < enemigos.size(); i++)
         {
-            Enemy::ENEMY_STATE enemystate = enemigos[i].Update(&pacman_map, { (short)player_x, (short)player_y });
+            Enemy::ENEMY_STATE enemystate = enemigos[i].Update(&pacman_map, player.position);
         switch (enemystate)
             {
 
         case Enemy::ENEMY_KILLED:
-            player_points += 50;
+            player.points += 50;
             break;
         case Enemy::ENEMY_DEAD:
 
-            player_lifes--;
+            player.lifes--;
                    
-            player_x = pacman_map.spawn_player.X;
-            player_y = pacman_map.spawn_player.Y;
+            player.position.X = pacman_map.spawn_player.X;
+            player.position.Y = pacman_map.spawn_player.Y;
             break;
 
             }
         }
 
-        if (player_lifes == 0)
+        if (player.lifes == 0)
         {
             std::cout << "GAME OVER";
-            player_char = ' ';
+         
             lose = true;
         }
       
@@ -193,11 +148,14 @@ void Logic()
 
 void Draw()
 {
-    ConsoleUtils::Console_SetPos(0,0);
+    ConsoleUtils::Console_SetPos(0, 0);
     pacman_map.Draw();
-    ConsoleUtils::Console_SetPos(player_x, player_y);
-    ConsoleUtils::Console_SetColor(ConsoleUtils::CONSOLE_COLOR::DARK_YELLOW);
-    std::cout << player_char;
+
+    /*   ConsoleUtils::Console_SetPos(player_x, player_y);
+       ConsoleUtils::Console_SetColor(ConsoleUtils::CONSOLE_COLOR::DARK_YELLOW);
+       std::cout << player_char;*/
+
+    player.Draw();
 
 
     //enemy1.Draw();
@@ -208,12 +166,12 @@ void Draw()
 
     ConsoleUtils::Console_ClearCharacter({ 0,(short)pacman_map.Height });
     ConsoleUtils::Console_SetColor(ConsoleUtils::CONSOLE_COLOR::CYAN);
-    std::cout << "Puntuacion actual: " << player_points << " Puntuacion pendiente: " << pacman_map.points << std::endl;
+    std::cout << "Puntuacion actual: " << player.points << " Puntuacion pendiente: " << pacman_map.points << std::endl;
     if (win)
     {
         ConsoleUtils::Console_SetColor(ConsoleUtils::CONSOLE_COLOR::GREEN);
         std::cout << "Has ganado!" << std::endl;
-    } 
+    }
     if (lose)
     {
         ConsoleUtils::Console_SetColor(ConsoleUtils::CONSOLE_COLOR::GREEN);
@@ -221,7 +179,7 @@ void Draw()
     }
 
 
-    std::cout << "Las vidas restantes son : "<< player_lifes << std::endl;
+    std::cout << "Las vidas restantes son : "<< player.lifes << std::endl;
     std::cout << "fotogramas: " << TimeManager::getInstance().frameCount << std::endl;
     std::cout << "Time: " << TimeManager::getInstance().time << std::endl;
     std::cout << "Delta Time: " << TimeManager::getInstance().deltaTime << std::endl;
