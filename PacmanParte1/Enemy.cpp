@@ -22,8 +22,15 @@ void Enemy::Draw()
 
 }
 
+void Enemy::PowerUpPicked()
+{
+	powerup_countdown = TimeManager::getInstance().time + powerup_countdown_time;
+}
+
 Enemy::ENEMY_STATE Enemy::Update(Map* _map, COORD _player)
 {
+
+
 	RandomDirection();
 	COORD newPosition = position;
 	newPosition.X += direction.X;
@@ -53,8 +60,15 @@ Enemy::ENEMY_STATE Enemy::Update(Map* _map, COORD _player)
 	ENEMY_STATE state = ENEMY_STATE::ENEMY_NONE;
 	if (position.X == _player.X && position.Y == _player.Y)
 	{
-		position = spawn;
-		state = ENEMY_STATE::ENEMY_KILLED;
+		if (powerup_countdown <= TimeManager::getInstance().time)
+		{
+			state = ENEMY_STATE::ENEMY_DEAD;
+		}
+		else
+		{
+			position = spawn;
+			state = ENEMY_STATE::ENEMY_KILLED;
+		}
 	}
 	return state; 
 }

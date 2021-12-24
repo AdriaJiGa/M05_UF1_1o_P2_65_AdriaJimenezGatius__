@@ -131,6 +131,11 @@ void Logic()
             pacman_map.points--;
             player_points++;
             pacman_map.SetTile(player_x_new, player_y_new, Map::MAP_TILES::MAP_EMPTY);
+            break; 
+        case Map::MAP_TILES::MAP_POWERUP:
+            pacman_map.points--;
+            player_points++;
+            pacman_map.SetTile(player_x_new, player_y_new, Map::MAP_TILES::MAP_EMPTY);
             break;
         }
 
