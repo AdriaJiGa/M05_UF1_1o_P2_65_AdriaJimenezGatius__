@@ -34,7 +34,7 @@ bool win = false;
 
 int main()
 {
- /*   TimeManager::getInstance().variable = 0; 
+ /*   TimeManager::getInstance().variable = 0; .
     std::cout << TimeManager::getInstance().variable;*/
 
     Setup();
