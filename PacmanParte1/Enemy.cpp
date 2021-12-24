@@ -70,6 +70,14 @@ Enemy::ENEMY_STATE Enemy::Update(Map* _map, COORD _player)
 			state = ENEMY_STATE::ENEMY_KILLED;
 		}
 	}
+	if (powerup_countdown <= TimeManager::getInstance().time)
+	{
+		foreground = foreground_attack;
+	}
+	else
+	{
+		foreground = foreground_powerUp;
+	}
 	return state; 
 }
 

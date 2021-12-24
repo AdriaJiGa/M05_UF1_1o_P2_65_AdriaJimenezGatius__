@@ -17,7 +17,10 @@ private:
 	const float powerup_countdown_time = 15;
 
 	ConsoleUtils::CONSOLE_COLOR foreground = ConsoleUtils::CONSOLE_COLOR::DARK_RED;
+	ConsoleUtils::CONSOLE_COLOR foreground_attack = ConsoleUtils::CONSOLE_COLOR::DARK_RED;
+
 	ConsoleUtils::CONSOLE_COLOR background = ConsoleUtils::CONSOLE_COLOR::BLACK;
+	ConsoleUtils::CONSOLE_COLOR foreground_powerUp = ConsoleUtils::CONSOLE_COLOR::CYAN;
 	void RandomDirection();
 public:
 	enum ENEMY_STATE {ENEMY_NONE, ENEMY_KILLED, ENEMY_DEAD};
@@ -27,9 +30,5 @@ public:
 	void PowerUpPicked();
 	ENEMY_STATE Update(Map* _map, COORD _player);
 	
-
-
-
-
 };
 
