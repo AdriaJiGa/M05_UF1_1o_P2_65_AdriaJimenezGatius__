@@ -36,8 +36,8 @@ bool lose = false;
 
 int main()
 {
- /*   TimeManager::getInstance().variable = 0; 
-    std::cout << TimeManager::getInstance().variable;*/
+
+
 
     Setup();
     while (run)
